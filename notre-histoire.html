@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notre Histoire ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --void: #03020a;
+      --deep: #0a0718;
+      --nebula1: #1a0a3c;
+      --nebula2: #0d1a3c;
+      --star: #e8deff;
+      --glow: #c4a8ff;
+      --rose: #ff8fab;
+      --gold: #f5d67b;
+      --mist: rgba(196,168,255,0.08);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--star);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    #cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--glow);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, opacity 0.3s;
+      box-shadow: 0 0 12px 4px rgba(196,168,255,0.6);
+    }
+    #cursor-trail {
+      position: fixed;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,168,255,0.3);
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: left 0.12s ease, top 0.12s ease;
+    }
+
+    /* Canvas for stars */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Particles */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1;
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.5; }
+      100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ─── HERO ─────────────────────────────── */
+    #hero {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    .nebula-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(26,10,60,0.9) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 20% 70%, rgba(13,26,60,0.6) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 50% at 80% 20%, rgba(60,10,40,0.4) 0%, transparent 60%);
+      z-index: -1;
+    }
+
+    .hero-subtitle {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: clamp(0.7rem, 2vw, 0.85rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0;
+      animation: fadeUp 1s ease 0.3s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3.5rem, 12vw, 9rem);
+      line-height: 0.95;
+      margin: 0.3em 0 0.2em;
+      background: linear-gradient(135deg, #fff 0%, var(--glow) 40%, var(--rose) 70%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.6s forwards;
+    }
+
+    .hero-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 4vw, 2rem);
+      color: var(--rose);
+      opacity: 0;
+      animation: fadeUp 1s ease 1s forwards;
+      text-shadow: 0 0 30px rgba(255,143,171,0.5);
+    }
+
+    .hero-divider {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--glow), transparent);
+      margin: 2.5rem auto;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.3s forwards;
+    }
+
+    .hero-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: rgba(232,222,255,0.6);
+      max-width: 480px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.5s forwards;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.2s forwards;
+    }
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,168,255,0.4);
+    }
+    .scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(196,168,255,0.4), transparent);
+      animation: pulse 2s ease infinite;
+    }
+
+    /* ─── TIMELINE ──────────────────────────── */
+    #timeline {
+      position: relative;
+      z-index: 2;
+      padding: 8rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--glow);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 6vw, 4rem);
+      text-align: center;
+      background: linear-gradient(135deg, #fff, var(--glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6rem;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 220px;
+      bottom: 80px;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--glow) 10%, rgba(196,168,255,0.3) 50%, var(--rose) 90%, transparent);
+      transform: translateX(-50%);
+    }
+
+    .moment {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      gap: 0 1.5rem;
+      margin-bottom: 6rem;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .moment.visible { opacity: 1; transform: translateY(0); }
+
+    .moment:nth-child(odd) .moment-content  { grid-column: 1; grid-row: 1; text-align: right; }
+    .moment:nth-child(odd) .moment-center   { grid-column: 2; grid-row: 1; }
+    .moment:nth-child(odd) .moment-empty    { grid-column: 3; grid-row: 1; }
+
+    .moment:nth-child(even) .moment-empty   { grid-column: 1; grid-row: 1; }
+    .moment:nth-child(even) .moment-center  { grid-column: 2; grid-row: 1; }
+    .moment:nth-child(even) .moment-content { grid-column: 3; grid-row: 1; text-align: left; }
+
+    .moment-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .moment-orb {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,168,255,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: radial-gradient(circle, rgba(196,168,255,0.15), transparent);
+      box-shadow: 0 0 20px rgba(196,168,255,0.25), inset 0 0 15px rgba(196,168,255,0.1);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .moment-content {
+      padding-top: 6px;
+    }
+
+    .moment-date {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      opacity: 0.8;
+    }
+
+    .moment-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 300;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+
+    .moment-text {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: rgba(232,222,255,0.55);
+      max-width: 280px;
+    }
+
+    .moment:nth-child(odd)  .moment-text { margin-left: auto; }
+    .moment:nth-child(even) .moment-text { margin-right: auto; }
+
+    .moment-card {
+      background: var(--mist);
+      border: 1px solid rgba(196,168,255,0.1);
+      border-radius: 2px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    .moment-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(196,168,255,0.06), transparent 70%);
+    }
+
+    /* ─── LOVE SECTION ──────────────────────── */
+    #love {
+      position: relative;
+      z-index: 2;
+      padding: 8rem 2rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .love-orb {
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,168,255,0.12) 0%, rgba(255,143,171,0.06) 40%, transparent 70%);
+      border: 1px solid rgba(196,168,255,0.15);
+      margin: 3rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: orbPulse 4s ease-in-out infinite;
+    }
+
+    .love-orb::before, .love-orb::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(196,168,255,0.08);
+      animation: orbPulse 4s ease-in-out infinite reverse;
+    }
+    .love-orb::before { inset: -20px; }
+    .love-orb::after  { inset: -45px; animation-delay: 1s; }
+
+    .love-heart {
+      font-size: 4rem;
+      animation: heartbeat 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255,143,171,0.8));
+    }
+
+    .love-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 4vw, 2.2rem);
+      line-height: 1.6;
+      color: rgba(232,222,255,0.75);
+      max-width: 600px;
+      margin: 3rem auto;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+    .love-message.visible { opacity: 1; transform: translateY(0); }
+
+    .signature {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.4rem;
+      color: var(--rose);
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.8s 0.4s;
+      text-shadow: 0 0 20px rgba(255,143,171,0.5);
+    }
+    .signature.visible { opacity: 1; }
+
+    /* ─── FOOTER ────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,168,255,0.2);
+    }
+
+    /* ─── KEYFRAMES ─────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 1; }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.05); }
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14%       { transform: scale(1.15); }
+      28%       { transform: scale(1); }
+      42%       { transform: scale(1.1); }
+      70%       { transform: scale(1); }
+    }
+    @keyframes glimmer {
+      0%, 100% { opacity: 0.15; }
+      50%       { opacity: 0.5; }
+    }
+
+    /* ─── RESPONSIVE ────────────────────────── */
+    @media (max-width: 600px) {
+      .timeline-line { left: 24px; }
+      .moment {
+        grid-template-columns: 48px 1fr;
+        grid-template-rows: auto;
+      }
+      .moment:nth-child(odd) .moment-content,
+      .moment:nth-child(even) .moment-content {
+        grid-column: 2; grid-row: 1;
+        text-align: left;
+      }
+      .moment:nth-child(odd) .moment-center,
+      .moment:nth-child(even) .moment-center {
+        grid-column: 1; grid-row: 1;
+      }
+      .moment-empty { display: none; }
+      .moment:nth-child(odd) .moment-text,
+      .moment:nth-child(even) .moment-text { margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+  <canvas id="starfield"></canvas>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="nebula-bg"></div>
+    <p class="hero-subtitle">Une histoire parmi les étoiles</p>
+    <h1 class="hero-title">Notre<br/>Histoire</h1>
+    <p class="hero-name">Éloïse &amp; Léo</p>
+    <div class="hero-divider"></div>
+    <p class="hero-quote">« Certaines âmes se reconnaissent avant même de se rencontrer — comme deux étoiles qui savent depuis toujours qu'elles partagent la même galaxie. »</p>
+    <div class="scroll-hint">
+      <span>Explorer</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ── TIMELINE ── -->
+  <section id="timeline">
+    <div class="timeline-line"></div>
+    <p class="section-label">Notre voyage</p>
+    <h2 class="section-title">Les moments qui comptent</h2>
+
+    <!-- Moment 1 -->
+    <div class="moment">
+      <div class="moment-content">
+        <div class="moment-card">
+          <p class="moment-date">14 Février 2023</p>
+          <h3 class="moment-heading">Le premier regard</h3>
+          <p class="moment-text">Ce soir-là, dans la lumière dorée d'une soirée oubliable, quelque chose d'inoubliable s'est produit. Ton regard a traversé la pièce et a changé tout ce que je croyais savoir sur le hasard.</p>
+        </div>
+      </div>
+      <div class="moment-center">
+        <div class="moment-orb">✨</div>
+      </div>
+      <div class="moment-empty"></div>
+    </div>
+
+    <!-- Moment 2 -->
+    <div class="moment">
+      <div class="moment-empty"></div>
+      <div class="moment-center">
+        <div class="moment-orb">🌙</div>
+      </div>
+      <div class="moment-content">
+        <div class="moment-card">
+          <p class="moment-date">3 Avril 2023</p>
+          <h3 class="moment-heading">Notre première nuit sous les étoiles</h3>
+          <p class="moment-text">Allongés dans l'herbe froide, on cherchait Orion et on ne trouvait que des raisons de rester éveillés jusqu'à l'aube. Le ciel entier semblait nous appartenir.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Moment 3 -->
+    <div class="moment">
+      <div class="moment-content">
+        <div class="moment-card">
+          <p class="moment-date">17 Juillet 2023</p>
+          <h3 class="moment-heading">Le voyage improvisé</h3>
+          <p class="moment-text">Un vendredi soir, deux billets de train achetés sans réfléchir, une ville inconnue. On a ri, on s'est perdus, on s'est retrouvés — et on a compris que l'aventure, c'est toi.</p>
+        </div>
+      </div>
+      <div class="moment-center">
+        <div class="moment-orb">🌊</div>
+      </div>
+      <div class="moment-empty"></div>
+    </div>
+
+    <!-- Moment 4 -->
+    <div class="moment">
+      <div class="moment-empty"></div>
+      <div class="moment-center">
+        <div class="moment-orb">💫</div>
+      </div>
+      <div class="moment-content">
+        <div class="moment-card">
+          <p class="moment-date">Aujourd'hui & toujours</p>
+          <h3 class="moment-heading">Chaque jour avec toi</h3>
+          <p class="moment-text">Les grands moments s'écrivent dans les étoiles, mais c'est dans les petits — le café du matin, ton rire, tes silences — que je te retrouve à chaque instant.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── LOVE SECTION ── -->
+  <section id="love">
+    <p class="section-label">Pour toi</p>
+    <h2 class="section-title">Ce que tu es pour moi</h2>
+
+    <div class="love-orb">
+      <div class="love-heart">♡</div>
+    </div>
+
+    <p class="love-message">
+      Tu es la constellation que j'ai appris à reconnaître dans le chaos du ciel.<br/>
+      Mon ancre et mon envol. Ma tempête douce.<br/>
+      Je t'aime aujourd'hui comme le ciel aime les étoiles —<br/>
+      <em>sans fin, et avec toute l'obscurité qu'il faut pour les voir briller.</em>
+    </p>
+    <p class="signature">— Léo 🌙</p>
+  </section>
+
+  <footer>
+    ✦ Fait avec amour, quelque part dans l'univers ✦
+  </footer>
+
+  <script>
+    // ── Custom cursor ──
+    const cursor = document.getElementById('cursor');
+    const trail  = document.getElementById('cursor-trail');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+      trail.style.left  = e.clientX + 'px';
+      trail.style.top   = e.clientY + 'px';
+    });
+
+    // ── Starfield ──
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 280; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.4 + 0.2,
+          alpha: Math.random(),
+          speed: Math.random() * 0.003 + 0.001,
+          phase: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.85
+            ? `rgba(245,214,123,`
+            : Math.random() > 0.5
+              ? `rgba(196,168,255,`
+              : `rgba(255,255,255,`
+        });
+      }
+    }
+
+    function drawStars(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const s of stars) {
+        const a = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = s.color + a + ')';
+        ctx.fill();
+      }
+    }
+
+    let raf;
+    function animate(t) {
+      drawStars(t * 0.001);
+      raf = requestAnimationFrame(animate);
+    }
+
+    resizeCanvas();
+    createStars();
+    animate(0);
+    window.addEventListener('resize', () => { resizeCanvas(); createStars(); });
+
+    // ── Floating particles (petals / sparks) ──
+    const PARTICLE_COUNT = 22;
+    const shapes = ['✦', '·', '✧', '⋆', '•'];
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const isShape = Math.random() > 0.5;
+      if (isShape) {
+        p.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+        p.style.color = Math.random() > 0.5 ? 'rgba(196,168,255,0.7)' : 'rgba(255,143,171,0.6)';
+        p.style.fontSize = (Math.random() * 12 + 8) + 'px';
+        p.style.width = 'auto';
+        p.style.height = 'auto';
+        p.style.background = 'none';
+      } else {
+        const size = Math.random() * 4 + 1;
+        p.style.width  = size + 'px';
+        p.style.height = size + 'px';
+        p.style.background = Math.random() > 0.5
+          ? 'rgba(196,168,255,0.5)'
+          : 'rgba(255,143,171,0.4)';
+        p.style.boxShadow = '0 0 6px rgba(196,168,255,0.5)';
+      }
+      p.style.left     = Math.random() * 100 + 'vw';
+      p.style.animationDuration  = (Math.random() * 18 + 10) + 's';
+      p.style.animationDelay     = (Math.random() * 15) + 's';
+      document.body.appendChild(p);
+    }
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.moment, .love-message, .signature')
+      .forEach(el => observer.observe(el));
+
+    // ── Sparkle on click ──
+    document.addEventListener('click', e => {
+      for (let i = 0; i < 8; i++) {
+        const spark = document.createElement('div');
+        spark.style.cssText = `
+          position: fixed;
+          left: ${e.clientX}px;
+          top:  ${e.clientY}px;
+          width: 4px; height: 4px;
+          border-radius: 50%;
+          background: ${Math.random()>0.5 ? '#c4a8ff' : '#ff8fab'};
+          pointer-events: none;
+          z-index: 9999;
+          animation: none;
+          transform: translate(-50%,-50%);
+          box-shadow: 0 0 6px 2px rgba(196,168,255,0.8);
+        `;
+        document.body.appendChild(spark);
+        const angle = (i / 8) * Math.PI * 2;
+        const dist  = 40 + Math.random() * 40;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        spark.animate([
+          { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
+        ], { duration: 600, easing: 'ease-out' }).onfinish = () => spark.remove();
+      }
+    });
+  </script>
+</body>
+</html>
